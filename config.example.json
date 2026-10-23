@@ -1,0 +1,7 @@
+{
+  "bot_token": "ВСТАВЬ_ТОКЕН_ОТ_BOTFATHER",
+  "chat_id": "-1004497651109",
+  "poll_seconds": 60,
+  "increase_by": 5,
+  "telegram_verify_ssl": true
+}
