@@ -169,32 +169,52 @@ def discover_chat_ids(cfg: dict) -> None:
     print("Скопируй только нужный chat_id в config.json.")
 
 
+
 def fetch_servers() -> dict[str, dict]:
     req = Request(
         SOURCE_URL,
         headers={
-            "User-Agent": USER_AGENT,
-            "Accept": "text/html,application/xhtml+xml",
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/130.0.0.0 Safari/537.36"
+            ),
+            "Accept": (
+                "text/html,application/xhtml+xml,"
+                "application/xml;q=0.9,*/*;q=0.8"
+            ),
+            "Accept-Language": "en-US,en;q=0.9",
             "Cache-Control": "no-cache",
-            "Pragma": "no-cache",
         },
     )
+
     try:
         with urlopen(req, timeout=25, context=SSL_CONTEXT) as response:
-            body = response.read(8_000_000).decode("utf-8", errors="replace")
+            body = response.read(8_000_000).decode(
+                "utf-8", errors="replace"
+            )
+    except HTTPError as exc:
+        log.error(
+            "PetriDish HTTP %s; server=%s; content-type=%s",
+            exc.code,
+            exc.headers.get("Server"),
+            exc.headers.get("Content-Type"),
+        )
+        raise
     except URLError as exc:
         if "CERTIFICATE_VERIFY_FAILED" not in str(exc):
             raise
-        log.warning("Сертификат сайта не прошёл проверку, читаю публичную страницу без проверки.")
-        with urlopen(req, timeout=25, context=INSECURE_CONTEXT) as response:
-            body = response.read(8_000_000).decode("utf-8", errors="replace")
+        log.error("Ошибка проверки TLS-сертификата PetriDish.")
+        raise
+
     parser = ServerParser()
     parser.feed(body)
+
     if len(parser.servers) < 10:
         raise RuntimeError(
-            f"В ответе найдено только {len(parser.servers)} активных серверов; "
-            "сохраняю старое состояние и не отправляю оповещения."
+            f"Найдено только {len(parser.servers)} активных серверов."
         )
+
     return parser.servers
 
 
