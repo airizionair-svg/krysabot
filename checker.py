@@ -18,7 +18,7 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parent
 CONFIG_PATH = ROOT / "config.json"
 STATE_PATH = ROOT / "state.json"
-SOURCE_URL = "https://petridish.pw/en/"
+SOURCE_URL = "https://io.petridish.pw/"
 USER_AGENT = "PetriDishOnlineChecker/1.0 (read-only public online monitor)"
 MAX_TELEGRAM_TEXT = 3500
 
